@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Master: English 7 (Audio Version)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2e7d32; /* Xanh lá đậm */
+            --secondary: #ff6f00; /* Cam đậm */
+            --accent: #1565c0;
+            --bg: #e8f5e9;
+            --card-bg: #ffffff;
+            --text: #37474f;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 60px; }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, var(--primary), #66bb6a);
+            color: white; padding: 15px 20px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        h1 { margin: 0; font-size: 24px; font-weight: 800; }
+        p { margin: 5px 0 0; opacity: 0.9; font-size: 14px; }
+
+        /* CONTROLS */
+        .controls {
+            padding: 15px; text-align: center; position: sticky; top: 0; 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); z-index: 100;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        select {
+            padding: 10px 20px; font-size: 16px; border-radius: 25px; border: 2px solid var(--primary);
+            background: white; font-weight: bold; color: var(--text); outline: none; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; max-width: 400px;
+        }
+
+        /* CONTAINER */
+        .container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
+
+        /* TABS */
+        .tabs { display: flex; justify-content: center; margin-bottom: 25px; gap: 15px; }
+        .tab-btn {
+            padding: 12px 30px; border: none; background: white; border-radius: 30px;
+            font-weight: 700; cursor: pointer; transition: 0.3s; color: #555;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-size: 15px;
+        }
+        .tab-btn.active { background: var(--secondary); color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 111, 0, 0.3); }
+
+        /* FLASHCARD GRID */
+        .flashcard-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card {
+            background: transparent; height: 240px; perspective: 1000px; cursor: pointer;
+        }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s;
+            transform-style: preserve-3d; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 15px; padding: 15px;
+        }
+        .card-front { background: white; color: var(--text); border: 2px solid #fff; }
+        .card-back { background: var(--primary); color: white; transform: rotateY(180deg); border: 2px solid var(--primary); }
+        
+        .word { font-size: 20px; font-weight: 800; margin-bottom: 5px; color: var(--primary); }
+        .pronounce { font-size: 14px; color: #777; font-style: italic; margin-bottom: 8px; font-family: 'Arial', sans-serif; }
+        .type { font-size: 12px; background: #eee; padding: 3px 8px; border-radius: 6px; color: #555; font-weight: 600; margin-bottom: 10px; }
+        .card-back .meaning { font-size: 18px; font-weight: 700; line-height: 1.4; }
+
+        /* AUDIO BUTTON */
+        .speak-btn {
+            background: #fff; border: 2px solid #eee; border-radius: 50%;
+            width: 40px; height: 40px; cursor: pointer; font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; color: var(--primary); margin-top: 5px;
+            z-index: 10;
+        }
+        .speak-btn:hover { background: #e8f5e9; border-color: var(--primary); transform: scale(1.1); }
+        .speak-btn:active { transform: scale(0.9); }
+
+        /* QUIZ MODE */
+        .quiz-area { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; max-width: 600px; margin: 0 auto; }
+        
+        .q-header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .q-word { font-size: 26px; font-weight: 800; color: var(--text); }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .opt-btn {
+            padding: 15px; background: #f9f9f9; border: 2px solid #eee; border-radius: 12px;
+            font-size: 16px; cursor: pointer; transition: 0.2s; font-weight: 600; color: #444;
+        }
+        .opt-btn:hover { background: #e3f2fd; border-color: var(--accent); color: var(--accent); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--primary); color: #1b5e20; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: #d32f2f; color: #b71c1c; opacity: 0.8; }
+        
+        .feedback { margin-top: 20px; font-weight: bold; height: 30px; font-size: 18px; }
+        .score-board { margin-bottom: 20px; font-size: 20px; color: var(--secondary); font-weight: 800; }
+
+        /* UTILS */
+        .hidden { display: none; }
+        .btn-restart {
+            margin-top: 25px; padding: 12px 35px; background: var(--accent); color: white; border: none;
+            border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
+        .btn-restart:hover { transform: translateY(-2px); }
+
+        @media (max-width: 600px) {
+            .flashcard-container { grid-template-columns: 1fr 1fr; }
+            .card { height: 220px; }
+            .word { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🎓 Vocabulary Master: English 7</h1>
+    <p>Global Success Units 1-12 (Audio Version)</p>
+</header>
+
+<div class="controls">
+    <label for="unit-select">📚 Chọn bài: </label>
+    <select id="unit-select" onchange="loadUnit()">
+        <option value="1">Unit 1: Hobbies</option>
+        <option value="2">Unit 2: Healthy Living</option>
+        <option value="3">Unit 3: Community Service</option>
+        <option value="4">Unit 4: Music and Arts</option>
+        <option value="5">Unit 5: Food and Drink</option>
+        <option value="6">Unit 6: A Visit to a School</option>
+        <option value="7">Unit 7: Traffic</option>
+        <option value="8">Unit 8: Films</option>
+        <option value="9">Unit 9: Festivals around the world</option>
+        <option value="10">Unit 10: Energy Sources</option>
+        <option value="11">Unit 11: Travelling in the Future</option>
+        <option value="12">Unit 12: English-speaking Countries</option>
+    </select>
+</div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="setMode('learn')">📖 Học Từ</button>
+        <button class="tab-btn" onclick="setMode('quiz')">❓ Trắc Nghiệm</button>
+    </div>
+
+    <div id="learn-mode">
+        <div class="flashcard-container" id="flashcards"></div>
+    </div>
+
+    <div id="quiz-mode" class="hidden">
+        <div class="quiz-area">
+            <div class="score-board">Điểm: <span id="score">0</span></div>
+            <div class="q-header">
+                <span id="q-text" class="q-word">Loading...</span>
+                <button class="speak-btn" onclick="speakCurrentQuiz()">🔊</button>
+            </div>
+            <div class="options-grid" id="q-options"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="btn-restart hidden" id="next-btn" onclick="nextQuestion()">Câu tiếp theo ➜</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DỮ LIỆU TỪ VỰNG TIẾNG ANH 7 (GLOBAL SUCCESS)
+    const db = {
+        1: [
+            {w:"belong to", t:"(v)", m:"thuộc về"},
+            {w:"benefit", t:"(n)", m:"lợi ích"},
+            {w:"bug", t:"(n)", m:"con bọ"},
+            {w:"cardboard", t:"(n)", m:"bìa các tông"},
+            {w:"dollhouse", t:"(n)", m:"nhà búp bê"},
+            {w:"gardening", t:"(n)", m:"làm vườn"},
+            {w:"glue", t:"(n)", m:"keo dán/hồ"},
+            {w:"horse riding", t:"(n)", m:"cưỡi ngựa"},
+            {w:"insect", t:"(n)", m:"côn trùng"},
+            {w:"jogging", t:"(n)", m:"chạy bộ thư giãn"},
+            {w:"making models", t:"(n)", m:"làm mô hình"},
+            {w:"maturity", t:"(n)", m:"sự trưởng thành"},
+            {w:"patient", t:"(adj)", m:"kiên nhẫn"},
+            {w:"popular", t:"(adj)", m:"được ưa thích"},
+            {w:"responsibility", t:"(n)", m:"sự chịu trách nhiệm"},
+            {w:"set", t:"(v)", m:"(mặt trời) lặn"},
+            {w:"stress", t:"(n)", m:"sự căng thẳng"},
+            {w:"take on", t:"(v)", m:"nhận thêm"},
+            {w:"unusual", t:"(adj)", m:"khác thường"},
+            {w:"valuable", t:"(adj)", m:"quý giá"},
+            {w:"yoga", t:"(n)", m:"yoga"}
+        ],
+        2: [
+            {w:"acne", t:"(n)", m:"mụn trứng cá"},
+            {w:"affect", t:"(v)", m:"tác động, ảnh hưởng"},
+            {w:"avoid", t:"(v)", m:"tránh"},
+            {w:"chapped", t:"(adj)", m:"bị nứt nẻ"},
+            {w:"dim", t:"(adj)", m:"lờ mờ, không đủ sáng"},
+            {w:"disease", t:"(n)", m:"bệnh"},
+            {w:"eyedrops", t:"(n)", m:"thuốc nhỏ mắt"},
+            {w:"fat", t:"(n)", m:"mỡ"},
+            {w:"fit", t:"(adj)", m:"gọn gàng, cân đối"},
+            {w:"health", t:"(n)", m:"sức khỏe"},
+            {w:"healthy", t:"(adj)", m:"lành mạnh"},
+            {w:"indoor", t:"(adj)", m:"trong nhà"},
+            {w:"lip balm", t:"(n)", m:"kem bôi môi (chống nẻ)"},
+            {w:"pimple", t:"(n)", m:"mụn"},
+            {w:"pop", t:"(v)", m:"nặn (mụn)"},
+            {w:"protein", t:"(n)", m:"chất đạm"},
+            {w:"skin condition", t:"(n)", m:"tình trạng da"},
+            {w:"soybean", t:"(n)", m:"đậu nành"},
+            {w:"sunburn", t:"(n)", m:"sự cháy nắng"},
+            {w:"tofu", t:"(n)", m:"đậu phụ"},
+            {w:"virus", t:"(n)", m:"(con) vi rút"},
+            {w:"vitamin", t:"(n)", m:"vitamin"}
+        ],
+        3: [
+            {w:"board game", t:"(n)", m:"trò chơi trên bàn cờ"},
+            {w:"clean-up activity", t:"(n)", m:"hoạt động dọn rửa"},
+            {w:"collect", t:"(v)", m:"thu thập, sưu tầm"},
+            {w:"community", t:"(n)", m:"cộng đồng"},
+            {w:"community service", t:"(n)", m:"dịch vụ cộng đồng"},
+            {w:"develop", t:"(v)", m:"phát triển"},
+            {w:"donate", t:"(v)", m:"cho, tặng"},
+            {w:"elderly", t:"(adj)", m:"lớn tuổi, cao tuổi"},
+            {w:"exchange", t:"(v)", m:"trao đổi"},
+            {w:"flooded", t:"(adj)", m:"bị lũ lụt"},
+            {w:"homeless", t:"(adj)", m:"vô gia cư"},
+            {w:"mountainous", t:"(adj)", m:"vùng núi"},
+            {w:"nursing", t:"(n)", m:"chăm sóc, điều dưỡng"},
+            {w:"nursing home", t:"(n)", m:"viện dưỡng lão"},
+            {w:"orphanage", t:"(n)", m:"trại trẻ mồ côi"},
+            {w:"plant", t:"(v)", m:"trồng cây"},
+            {w:"protect", t:"(v)", m:"bảo vệ"},
+            {w:"proud", t:"(adj)", m:"tự hào"},
+            {w:"provide", t:"(v)", m:"cung cấp"},
+            {w:"rural area", t:"(n)", m:"vùng nông thôn"},
+            {w:"skill", t:"(n)", m:"kỹ năng"},
+            {w:"teenager", t:"(n)", m:"thanh thiếu niên"},
+            {w:"tutor", t:"(v)", m:"phụ đạo, dạy học"},
+            {w:"volunteer", t:"(v, n)", m:"tình nguyện (viên)"}
+        ],
+        4: [
+            {w:"anthem", t:"(n)", m:"bài quốc ca"},
+            {w:"character", t:"(n)", m:"nhân vật"},
+            {w:"compose", t:"(v)", m:"soạn, biên soạn"},
+            {w:"composer", t:"(n)", m:"nhà soạn nhạc"},
+            {w:"concert", t:"(n)", m:"buổi hòa nhạc"},
+            {w:"control", t:"(v)", m:"điều khiển"},
+            {w:"country music", t:"(n)", m:"nhạc đồng quê"},
+            {w:"exhibition", t:"(n)", m:"cuộc triển lãm"},
+            {w:"folk music", t:"(n)", m:"nhạc dân gian"},
+            {w:"gallery", t:"(n)", m:"phòng triển lãm tranh"},
+            {w:"musical instrument", t:"(n)", m:"nhạc cụ"},
+            {w:"originate", t:"(v)", m:"bắt nguồn, xuất phát"},
+            {w:"perform", t:"(v)", m:"biểu diễn"},
+            {w:"performance", t:"(n)", m:"buổi biểu diễn"},
+            {w:"photography", t:"(n)", m:"nhiếp ảnh"},
+            {w:"portrait", t:"(n)", m:"bức chân dung"},
+            {w:"prefer", t:"(v)", m:"thích hơn"},
+            {w:"puppet", t:"(n)", m:"con rối"},
+            {w:"sculpture", t:"(n)", m:"điêu khắc"},
+            {w:"water puppetry", t:"(n)", m:"múa rối nước"}
+        ],
+        5: [
+            {w:"beef", t:"(n)", m:"thịt bò"},
+            {w:"butter", t:"(n)", m:"bơ"},
+            {w:"dish", t:"(n)", m:"món ăn"},
+            {w:"eel", t:"(n)", m:"con lươn"},
+            {w:"flour", t:"(n)", m:"bột"},
+            {w:"fried", t:"(adj)", m:"được chiên / rán"},
+            {w:"green tea", t:"(n)", m:"chè xanh"},
+            {w:"ingredient", t:"(n)", m:"thành phần, nguyên liệu"},
+            {w:"juice", t:"(n)", m:"nước ép"},
+            {w:"lemonade", t:"(n)", m:"nước chanh"},
+            {w:"mineral water", t:"(n)", m:"nước khoáng"},
+            {w:"noodles", t:"(n)", m:"mì, mì sợi, phở"},
+            {w:"omelette", t:"(n)", m:"trứng tráng"},
+            {w:"onion", t:"(n)", m:"củ hành"},
+            {w:"pancake", t:"(n)", m:"bánh kếp"},
+            {w:"pepper", t:"(n)", m:"hạt tiêu"},
+            {w:"pie", t:"(n)", m:"bánh nướng, bánh hấp"},
+            {w:"pork", t:"(n)", m:"thịt lợn"},
+            {w:"recipe", t:"(n)", m:"công thức nấu ăn"},
+            {w:"roast", t:"(adj)", m:"(được) quay, nướng"},
+            {w:"salt", t:"(n)", m:"muối"},
+            {w:"sauce", t:"(n)", m:"nước chấm, nước xốt"},
+            {w:"shrimp", t:"(n)", m:"con tôm"},
+            {w:"soup", t:"(n)", m:"xúp, canh, cháo"},
+            {w:"spring rolls", t:"(n)", m:"nem rán"},
+            {w:"tablespoon", t:"(n)", m:"thìa / muỗng xúp"},
+            {w:"teaspoon", t:"(n)", m:"thìa nhỏ uống trà"},
+            {w:"toast", t:"(n)", m:"bánh mì nướng"}
+        ],
+        6: [
+            {w:"celebrate", t:"(v)", m:"làm lễ kỉ niệm"},
+            {w:"entrance exam", t:"(n)", m:"kì thi đầu vào"},
+            {w:"equipment", t:"(n)", m:"đồ dùng, thiết bị"},
+            {w:"extra", t:"(adj)", m:"thêm"},
+            {w:"facility", t:"(n)", m:"thiết bị, tiện nghi"},
+            {w:"gifted", t:"(adj)", m:"năng khiếu"},
+            {w:"laboratory", t:"(n)", m:"phòng thí nghiệm"},
+            {w:"lower secondary school", t:"(n)", m:"trường THCS"},
+            {w:"midterm", t:"(n)", m:"giữa học kì"},
+            {w:"opportunity", t:"(n)", m:"thời điểm, cơ hội"},
+            {w:"outdoor", t:"(adj)", m:"ngoài trời"},
+            {w:"private", t:"(adj)", m:"riêng, tư"},
+            {w:"projector", t:"(n)", m:"máy chiếu"},
+            {w:"resource", t:"(n)", m:"tài nguyên"},
+            {w:"royal", t:"(adj)", m:"thuộc hoàng gia"},
+            {w:"service", t:"(n)", m:"dịch vụ"},
+            {w:"share", t:"(v)", m:"chia sẻ"},
+            {w:"talented", t:"(adj)", m:"tài năng"},
+            {w:"well-known", t:"(adj)", m:"nổi tiếng"}
+        ],
+        7: [
+            {w:"bumpy", t:"(adj)", m:"lồi lõm, nhiều ổ gà"},
+            {w:"distance", t:"(n)", m:"khoảng cách"},
+            {w:"fine", t:"(v)", m:"phạt"},
+            {w:"fly", t:"(v)", m:"bay, lái máy bay"},
+            {w:"handlebars", t:"(n)", m:"tay lái, ghi đông"},
+            {w:"lane", t:"(n)", m:"làn đường"},
+            {w:"obey traffic rules", t:"(v)", m:"tuân thủ luật giao thông"},
+            {w:"park", t:"(v)", m:"đỗ xe"},
+            {w:"passenger", t:"(n)", m:"hành khách"},
+            {w:"pavement", t:"(n)", m:"vỉa hè"},
+            {w:"pedestrian", t:"(n)", m:"người đi bộ"},
+            {w:"plane", t:"(n)", m:"máy bay"},
+            {w:"road sign", t:"(n)", m:"biển báo giao thông"},
+            {w:"roof", t:"(n)", m:"nóc xe, mái nhà"},
+            {w:"safety", t:"(n)", m:"sự an toàn"},
+            {w:"seatbelt", t:"(n)", m:"đai an toàn"},
+            {w:"traffic jam", t:"(n)", m:"tắc đường"},
+            {w:"traffic rule", t:"(n)", m:"luật giao thông"},
+            {w:"vehicle", t:"(n)", m:"xe cộ, phương tiện"},
+            {w:"zebra crossing", t:"(n)", m:"vạch kẻ cho người đi bộ"}
+        ],
+        8: [
+            {w:"acting", t:"(n)", m:"diễn xuất"},
+            {w:"comedy", t:"(n)", m:"phim hài"},
+            {w:"confusing", t:"(adj)", m:"khó hiểu, gây bối rối"},
+            {w:"director", t:"(n)", m:"người đạo diễn"},
+            {w:"documentary", t:"(n)", m:"phim tài liệu"},
+            {w:"dull", t:"(adj)", m:"buồn tẻ, chán ngắt"},
+            {w:"enjoyable", t:"(adj)", m:"thú vị, thích thú"},
+            {w:"fantasy", t:"(n)", m:"phim giả tưởng"},
+            {w:"frightening", t:"(adj)", m:"làm sợ hãi, rùng rợn"},
+            {w:"gripping", t:"(adj)", m:"hấp dẫn, thú vị"},
+            {w:"horror film", t:"(n)", m:"phim kinh dị"},
+            {w:"moving", t:"(adj)", m:"cảm động"},
+            {w:"must-see", t:"(n)", m:"bộ phim cần xem"},
+            {w:"poster", t:"(n)", m:"áp phích quảng cáo"},
+            {w:"review", t:"(n)", m:"bài phê bình"},
+            {w:"scary", t:"(adj)", m:"sợ hãi, rùng rợn"},
+            {w:"science fiction", t:"(n)", m:"phim khoa học viễn tưởng"},
+            {w:"shocking", t:"(adj)", m:"làm sửng sốt"},
+            {w:"star", t:"(v)", m:"đóng vai chính"},
+            {w:"survey", t:"(n)", m:"cuộc khảo sát"},
+            {w:"twin", t:"(n)", m:"đứa trẻ sinh đôi"},
+            {w:"violent", t:"(adj)", m:"có nhiều cảnh bạo lực"},
+            {w:"wizard", t:"(n)", m:"phù thủy"}
+        ],
+        9: [
+            {w:"candy", t:"(n)", m:"kẹo"},
+            {w:"Cannes Film Festival", t:"(n)", m:"Liên hoan phim Cannes"},
+            {w:"carve", t:"(v)", m:"chạm, khắc"},
+            {w:"celebrate", t:"(v)", m:"kỉ niệm, tổ chức"},
+            {w:"costume", t:"(n)", m:"trang phục"},
+            {w:"decorate", t:"(v)", m:"trang trí"},
+            {w:"decoration", t:"(n)", m:"đồ trang trí"},
+            {w:"disappointing", t:"(adj)", m:"đáng thất vọng"},
+            {w:"disappointment", t:"(n)", m:"sự thất vọng"},
+            {w:"Dutch", t:"(adj)", m:"thuộc về Hà Lan"},
+            {w:"Easter", t:"(n)", m:"Lễ Phục sinh"},
+            {w:"feast", t:"(n)", m:"bữa tiệc"},
+            {w:"feature", t:"(v)", m:"trình diễn đặc biệt"},
+            {w:"fireworks display", t:"(n)", m:"bắn pháo hoa"},
+            {w:"float", t:"(n)", m:"xe điễu hành"},
+            {w:"folk dance", t:"(n)", m:"điệu nhảy dân gian"},
+            {w:"Holland", t:"(n)", m:"nước Hà Lan"},
+            {w:"Mid-Autumn Festival", t:"(n)", m:"Tết Trung thu"},
+            {w:"parade", t:"(n)", m:"cuộc diễu hành"},
+            {w:"perform", t:"(v)", m:"biểu diễn"},
+            {w:"performance", t:"(n)", m:"tiết mục biểu diễn"},
+            {w:"symbol", t:"(n)", m:"biểu tượng"},
+            {w:"take part in", t:"(v)", m:"tham gia"},
+            {w:"Thanksgiving", t:"(n)", m:"Lễ Tạ ơn"}
+        ],
+        10: [
+            {w:"available", t:"(adj)", m:"sẵn có"},
+            {w:"biogas", t:"(n)", m:"khí sinh học"},
+            {w:"carbon footprint", t:"(n)", m:"dấu chân carbon"},
+            {w:"electricity", t:"(n)", m:"điện năng"},
+            {w:"energy", t:"(n)", m:"năng lượng"},
+            {w:"hydro", t:"(adj)", m:"thuộc về nước"},
+            {w:"light bulb", t:"(n)", m:"bóng đèn"},
+            {w:"limited", t:"(adj)", m:"bị hạn chế"},
+            {w:"non-renewable", t:"(adj)", m:"không thể thay thế"},
+            {w:"nuclear", t:"(adj)", m:"thuộc về hạt nhân"},
+            {w:"overcool", t:"(v)", m:"làm cho quá lạnh"},
+            {w:"overheat", t:"(v)", m:"làm cho quá nóng"},
+            {w:"panel", t:"(n)", m:"tấm ghép (pin mặt trời)"},
+            {w:"produce", t:"(v)", m:"sản xuất"},
+            {w:"reduce", t:"(v)", m:"giảm"},
+            {w:"renewable", t:"(adj)", m:"có thể thay thế"},
+            {w:"replace", t:"(v)", m:"thay thế"},
+            {w:"solar", t:"(adj)", m:"thuộc mặt trời"},
+            {w:"source", t:"(n)", m:"nguồn"},
+            {w:"syllable", t:"(n)", m:"âm tiết"},
+            {w:"tap", t:"(n)", m:"vòi"},
+            {w:"warm", t:"(v)", m:"(làm cho) ấm lên"}
+        ],
+        11: [
+            {w:"autopilot", t:"(n)", m:"chế độ lái tự động"},
+            {w:"bamboo-copter", t:"(n)", m:"chong chóng tre"},
+            {w:"comfortable", t:"(adj)", m:"thoải mái"},
+            {w:"convenient", t:"(adj)", m:"thuận tiện"},
+            {w:"disappear", t:"(v)", m:"biến mất"},
+            {w:"driverless", t:"(adj)", m:"không người lái"},
+            {w:"eco-friendly", t:"(adj)", m:"thân thiện với môi trường"},
+            {w:"economical", t:"(adj)", m:"tiết kiệm nhiên liệu"},
+            {w:"fume", t:"(n)", m:"khói"},
+            {w:"function", t:"(n)", m:"chức năng"},
+            {w:"hover scooter", t:"(n)", m:"xe trượt bay"},
+            {w:"hyperloop", t:"(n)", m:"hệ thống giao thông tốc độ cao"},
+            {w:"mode of travel", t:"(n)", m:"phương thức đi lại"},
+            {w:"pedal", t:"(v)", m:"đạp (xe đạp)"},
+            {w:"run on", t:"(v)", m:"chạy bằng (nhiên liệu nào)"},
+            {w:"sail", t:"(v)", m:"lướt buồm"},
+            {w:"solar-powered", t:"(adj)", m:"chạy bằng năng lượng mặt trời"},
+            {w:"solowheel", t:"(n)", m:"phương tiện tự hành cá nhân 1 bánh"},
+            {w:"walkcar", t:"(n)", m:"ô tô tự hành dùng chân"},
+            {w:"teleporter", t:"(n)", m:"thiết bị dịch chuyển tức thời"}
+        ],
+        12: [
+            {w:"amazement", t:"(n)", m:"sự ngạc nhiên"},
+            {w:"amazing", t:"(adj)", m:"ngạc nhiên (thích thú)"},
+            {w:"ancient", t:"(adj)", m:"cổ kính, lâu đời"},
+            {w:"capital", t:"(n)", m:"thủ đô"},
+            {w:"castle", t:"(n)", m:"lâu đài"},
+            {w:"coastline", t:"(n)", m:"đường bờ biển"},
+            {w:"culture", t:"(n)", m:"nền văn hóa"},
+            {w:"historic", t:"(adj)", m:"thuộc về lịch sử"},
+            {w:"island country", t:"(n)", m:"đảo quốc"},
+            {w:"kilt", t:"(n)", m:"váy truyền thống đàn ông Scotland"},
+            {w:"landscape", t:"(n)", m:"phong cảnh"},
+            {w:"local", t:"(adj)", m:"thuộc về địa phương"},
+            {w:"native", t:"(adj)", m:"bản địa, nguyên gốc"},
+            {w:"penguin", t:"(n)", m:"chim cánh cụt"},
+            {w:"royal", t:"(adj)", m:"thuộc về hoàng gia"},
+            {w:"shining", t:"(adj)", m:"chói chang, chan hòa ánh nắng"},
+            {w:"sunset", t:"(n)", m:"mặt trời lặn"},
+            {w:"symbol", t:"(n)", m:"biểu tượng"},
+            {w:"tattoo", t:"(n)", m:"hình xăm"},
+            {w:"tower", t:"(n)", m:"tháp"}
+        ]
+    };
+
+    let currentUnit = 1;
+    let score = 0;
+    let currentQuizIndex = 0;
+    let quizData = [];
+
+    // INIT
+    window.onload = () => {
+        loadUnit();
+    };
+
+    function loadUnit() {
+        currentUnit = parseInt(document.getElementById('unit-select').value);
+        renderFlashcards();
+        setMode('learn');
+    }
+
+    function setMode(mode) {
+        document.getElementById('learn-mode').classList.toggle('hidden', mode !== 'learn');
+        document.getElementById('quiz-mode').classList.toggle('hidden', mode !== 'quiz');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        if(mode === 'quiz') startQuiz();
+    }
+
+    /* AUDIO FUNCTIONS */
+    function speakWord(text, e) {
+        if(e) e.stopPropagation();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function speakCurrentQuiz() {
+        const word = document.getElementById('q-text').innerText;
+        speakWord(word);
+    }
+
+    /* FLASHCARD LOGIC */
+    function renderFlashcards() {
+        const container = document.getElementById('flashcards');
+        container.innerHTML = '';
+        const words = db[currentUnit];
+        words.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div class="word">${item.w}</div>
+                        <div class="type">${item.t}</div>
+                        <button class="speak-btn" onclick="speakWord('${item.w.replace(/'/g, "\\'")}', event)">🔊</button>
+                        <div style="font-size:12px; margin-top:15px; color:#999; font-style:italic">Chạm để lật</div>
+                    </div>
+                    <div class="card-back">
+                        <div class="meaning">${item.m}</div>
+                    </div>
+                </div>
+            `;
+            card.onclick = () => card.classList.toggle('flipped');
+            container.appendChild(card);
+        });
+    }
+
+    /* QUIZ LOGIC */
+    function startQuiz() {
+        score = 0;
+        currentQuizIndex = 0;
+        document.getElementById('score').innerText = score;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').classList.add('hidden');
+        
+        let words = [...db[currentUnit]];
+        quizData = words.sort(() => 0.5 - Math.random()); 
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if(currentQuizIndex >= quizData.length) {
+            document.querySelector('.quiz-area').innerHTML = `
+                <h2 style="color:var(--secondary)">🏆 Hoàn thành!</h2>
+                <p style="font-size:20px">Điểm số: <b>${score} / ${quizData.length * 10}</b></p>
+                <button class="btn-restart" onclick="location.reload()">Chọn bài khác</button>
+            `;
+            return;
+        }
+
+        const item = quizData[currentQuizIndex];
+        document.getElementById('q-text').innerText = item.w;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').classList.add('hidden');
+        
+        // Tạo đáp án
+        const correctMean = item.m;
+        let options = [correctMean];
+        
+        let otherWords = db[currentUnit].filter(x => x.w !== item.w);
+        if(otherWords.length < 3) {
+            let backupWords = db[1].filter(x => x.w !== item.w);
+            otherWords = otherWords.concat(backupWords);
+        }
+        
+        let shuffledOthers = otherWords.sort(() => 0.5 - Math.random()).slice(0, 3);
+        shuffledOthers.forEach(x => options.push(x.m));
+        
+        options.sort(() => 0.5 - Math.random());
+
+        const optContainer = document.getElementById('q-options');
+        optContainer.innerHTML = '';
+        
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, correctMean);
+            optContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.opt-btn');
+        btns.forEach(b => b.disabled = true);
+
+        if(selected === correct) {
+            btn.classList.add('correct');
+            document.getElementById('feedback').innerText = "Chính xác! 🎉";
+            document.getElementById('feedback').style.color = "var(--primary)";
+            score += 10;
+            document.getElementById('score').innerText = score;
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('feedback').innerText = `Sai rồi! Đáp án: ${correct}`;
+            document.getElementById('feedback').style.color = "#d32f2f";
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+        }
+        document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        currentQuizIndex++;
+        showQuestion();
+    }
+</script>
+
+</body>
+</html>
